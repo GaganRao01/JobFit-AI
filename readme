@@ -1,12 +1,5 @@
 # 🚀 JobFit-AI: Your AI-Powered Career Companion 🤖
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/release/python-390/)
-[![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://streamlit.io/)
-[![LangChain](https://img.shields.io/badge/LangChain-v0.1-brightgreen)](https://www.langchain.com/)
-[![LangGraph](https://img.shields.io/badge/LangGraph-Enabled-orange)](https://python.langchain.com/docs/langgraph)
-[![Google Gemini](https://img.shields.io/badge/Google-Gemini_1.5_Pro-blueviolet)](https://ai.google.dev/gemini-api)
-
 ## ✨ Overview
 
 **JobFit-AI** is a powerful, open-source web application designed to revolutionize your job search! It combines cutting-edge AI with insightful job market data to provide you with:
@@ -36,16 +29,16 @@ JobFit-AI is built with a modern tech stack, including Streamlit, LangChain, Lan
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** [Streamlit](https://streamlit.io/) - A fast and intuitive way to build interactive web apps in Python.
+* **Frontend:** Streamlit - A fast and intuitive way to build interactive web apps in Python.
 * **NLP & AI:**
-  * [Google Gemini 1.5 Pro](https://ai.google.dev/gemini-api) - A powerful large language model for in-depth text analysis and feedback generation.
-  * [LangChain](https://www.langchain.com/) - A framework for developing applications powered by language models.
-  * [LangGraph](https://python.langchain.com/docs/langgraph) - For building stateful, multi-actor applications with LLMs (used for the resume analysis workflow).
-  * [SpaCy](https://spacy.io/) - For advanced natural language processing tasks (NER, POS tagging).
+  * Google Gemini 1.5 Pro - A powerful large language model for in-depth text analysis and feedback generation.
+  * LangChain - A framework for developing applications powered by language models.
+  * LangGraph - For building stateful, multi-actor applications with LLMs (used for the resume analysis workflow).
+  * SpaCy - For advanced natural language processing tasks (NER, POS tagging).
 * **Web Scraping:**
-  * [Firecrawl](https://firecrawl.dev/) - For extracting job descriptions from Indeed URLs.
-  * [SerpAPI](https://serpapi.com/) - For extracting job descriptions from LinkedIn URLs and as a fallback for Indeed.
-* **Data processing/visualization:** [Pandas](https://pandas.pydata.org/), [Plotly](https://plotly.com/python/)
+  * Firecrawl - For extracting job descriptions from Indeed URLs.
+  * SerpAPI - For extracting job descriptions from LinkedIn URLs and as a fallback for Indeed.
+* **Data processing/visualization:** Pandas, Plotly
 * **Other:** `pdfminer.six`, `python-docx`, `beautifulsoup4`, `requests`, `nest_asyncio`, `python-dotenv`.
 
 ## 🚀 Getting Started
@@ -103,4 +96,3 @@ SERPAPI_KEY=your_serpapi_key
 
 ```bash
 streamlit run app.py
-
