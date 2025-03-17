@@ -102,3 +102,21 @@ JobFit-AI is built with a modern tech stack, including Streamlit, LangChain, Lan
 
 ```bash
 streamlit run app.py
+```
+
+This will start the Streamlit application, and you can access it in your web browser (usually at http://localhost:8501).
+
+## 🔥 Try out the app now: [JobFit-AI Live Demo](https://get-jobfit-ai.streamlit.app/)
+
+💻 Usage
+
+Upload Your Resume: On the "Upload" page, upload your resume in PDF or DOCX format.
+
+Provide Job Description: Either paste the job description text directly or enter the URL of the job posting (LinkedIn and Indeed URLs are supported).
+
+Analyze: Click the "Analyze Resume" button. The analysis may take up to a minute.
+
+View Results: The "Results" page will display detailed feedback, a relevance score, and personalized recommendations.
+
+Explore Job Market: Navigate to the "Dashboard" page to explore interactive visualizations of the Indian job market data. Use the filters in the sidebar to customize the data displayed.
+
