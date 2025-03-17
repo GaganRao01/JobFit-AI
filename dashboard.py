@@ -24,7 +24,7 @@ def show_dashboard():
         *   **Job Freshness:** Analyze job freshness.
     """)
 
-    # Removed Back button from here
+    
 
     @st.cache_data
     def load_data():
@@ -35,10 +35,8 @@ def show_dashboard():
             data = pd.read_csv(csv_file_path)
 
             # --- Data Cleaning (Case-Sensitive) ---
-            data.columns = data.columns.str.strip()  # Keep whitespace removal
-            # NO lowercasing or renaming needed.  Use original column names.
-
-            # Convert 'publishedAt' to datetime 
+            data.columns = data.columns.str.strip()  
+            
             try:
                 data['publishedAt'] = pd.to_datetime(data['publishedAt'], errors='coerce')
             except Exception as e:
@@ -52,7 +50,6 @@ def show_dashboard():
             data['applicationsCount'] = data['applicationsCount'].fillna(0)
             data['workType'] = data['workType'].fillna("Unspecified")
             data.dropna(subset=['sector'], inplace=True)
-            # --- End Data Cleaning ---
 
             st.success("Data loaded successfully!")
             return data
@@ -84,11 +81,11 @@ def show_dashboard():
             
             df = pd.DataFrame({
                 'title': np.random.choice(job_titles, 1000),
-                'companyName': np.random.choice(companies, 1000),  # Corrected
+                'companyName': np.random.choice(companies, 1000),  
                 'city': np.random.choice(locations, 1000),
-                'publishedAt': pd.date_range(start='2023-01-01', end='2024-03-01', periods=1000), # Corrected
-                'workType': np.random.choice(work_types, 1000), # Corrected
-                'applicationsCount': np.random.randint(0, 500, 1000), # Corrected
+                'publishedAt': pd.date_range(start='2023-01-01', end='2024-03-01', periods=1000), 
+                'workType': np.random.choice(work_types, 1000),
+                'applicationsCount': np.random.randint(0, 500, 1000), 
                 'sector': np.random.choice(sectors, 1000)
             })
             return df
@@ -98,7 +95,7 @@ def show_dashboard():
         with st.expander("View Data Sample"):
             st.dataframe(data.head(10))
 
-    # --- Sidebar Filters (Case-Sensitive) ---
+    # --- Sidebar Filters  ---
     st.sidebar.header("Filters")
 
     # Date Range filter
@@ -162,7 +159,7 @@ def show_dashboard():
 
    
 
-    # --- Visualizations (Case-Sensitive) ---
+    # --- Visualizations  ---
     st.header("Job Posting Insights")
 
     # --- Row 1: Basic metrics ---
