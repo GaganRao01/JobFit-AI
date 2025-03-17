@@ -38,16 +38,16 @@ def show_dashboard():
             data.columns = data.columns.str.strip()  # Keep whitespace removal
             # NO lowercasing or renaming needed.  Use original column names.
 
-            # Convert 'publishedAt' to datetime (using the exact column name)
+            # Convert 'publishedAt' to datetime 
             try:
                 data['publishedAt'] = pd.to_datetime(data['publishedAt'], errors='coerce')
             except Exception as e:
                 st.warning("Date conversion issue. Check 'publishedAt' column in data.")
                 st.write(f"Error details: {e}")
-                # The line below is redundant, but included for consistency with the original.
+
                 data['publishedAt'] = pd.to_datetime(data['publishedAt'], errors='coerce')
 
-            # Handle missing values (using exact column names)
+            
             data.dropna(subset=['publishedAt'], inplace=True)
             data['applicationsCount'] = data['applicationsCount'].fillna(0)
             data['workType'] = data['workType'].fillna("Unspecified")
@@ -81,7 +81,7 @@ def show_dashboard():
             work_types = ['On-site', 'Remote', 'Hybrid']
             sectors = ['Technology, Information and Internet', 'IT Services and IT Consulting', 'Financial Services']
 
-            # Use column names consistent with your *actual* data, if you were to create sample data
+            
             df = pd.DataFrame({
                 'title': np.random.choice(job_titles, 1000),
                 'companyName': np.random.choice(companies, 1000),  # Corrected
@@ -160,7 +160,7 @@ def show_dashboard():
     else:
         st.sidebar.warning("Sector filter not available due to data issues.")
 
-    # dashboard.py (Chunk 2)
+   
 
     # --- Visualizations (Case-Sensitive) ---
     st.header("Job Posting Insights")
@@ -210,19 +210,19 @@ def show_dashboard():
     st.subheader("Peak Posting Times")
     if 'publishedAt' in data.columns:
         data['day_of_week'] = data['publishedAt'].dt.day_name()
-        #data['hour_of_day'] = data['publishedAt'].dt.hour # Removed
+        #data['hour_of_day'] = data['publishedAt'].dt.hour 
         day_of_week_counts = data['day_of_week'].value_counts().reset_index()
         day_of_week_counts.columns = ['Day of Week', 'Count']
-        # Use a different color palette for days of the week
+        
         fig_day = px.bar(day_of_week_counts, x='Day of Week', y='Count', title='Job Postings by Day of the Week', labels={'Count': 'Number of Postings'}, color='Day of Week', color_discrete_sequence=px.colors.qualitative.Pastel)
         st.plotly_chart(fig_day, use_container_width=True)
 
 
-        #hourly_counts = data['hour_of_day'].value_counts().sort_index().reset_index() #Removed
-        #hourly_counts.columns = ['Hour of Day', 'Count'] #Removed
+        #hourly_counts = data['hour_of_day'].value_counts().sort_index().reset_index()
+        #hourly_counts.columns = ['Hour of Day', 'Count'] 
         # Use a different color scale for hours of the day
-        #fig_hour = px.bar(hourly_counts, x='Hour of Day', y='Count', title='Job Postings by Hour of the Day', labels={'Count': 'Number of Postings'}, color='Hour of Day', color_continuous_scale=px.colors.sequential.Viridis) #Removed
-        #st.plotly_chart(fig_hour, use_container_width=True) # Removed
+        #fig_hour = px.bar(hourly_counts, x='Hour of Day', y='Count', title='Job Postings by Hour of the Day', labels={'Count': 'Number of Postings'}, color='Hour of Day', color_continuous_scale=px.colors.sequential.Viridis) 
+        #st.plotly_chart(fig_hour, use_container_width=True) 
     else:
         st.write("Peak posting times are not available.")
 
@@ -233,8 +233,8 @@ def show_dashboard():
         average_days_old = data['days_since_posted'].mean()
         st.metric("Average Days Since Posted", f"{average_days_old:.1f} days")
         # Use a different color scale for the histogram
-        #fig_freshness = px.histogram(data, x='days_since_posted', nbins=30, title='Distribution of Days Since Posted', labels={'days_since_posted': 'Days Since Posted'}, color_discrete_sequence=px.colors.sequential.RdBu) # Removed
-        #st.plotly_chart(fig_freshness, use_container_width=True) # Removed
+        #fig_freshness = px.histogram(data, x='days_since_posted', nbins=30, title='Distribution of Days Since Posted', labels={'days_since_posted': 'Days Since Posted'}, color_discrete_sequence=px.colors.sequential.RdBu) 
+        #st.plotly_chart(fig_freshness, use_container_width=True) 
     else:
         st.write("Job freshness information not available.")
 
@@ -265,7 +265,7 @@ def show_dashboard():
     if 'companyName' in data.columns:
         company_counts = data['companyName'].value_counts().head(10).reset_index()
         company_counts.columns = ['Company Name', 'Count']
-        # Use color for the bars
+        
         fig = px.bar(company_counts, x='Company Name', y='Count', title='Top 10 Hiring Companies', color='Company Name', color_discrete_sequence=px.colors.qualitative.Alphabet)
         fig.update_xaxes(tickangle=45)
         st.plotly_chart(fig, use_container_width=True)
@@ -296,4 +296,3 @@ def show_dashboard():
 
 def dashboard_page():
     show_dashboard()
-# main function and other parts should not be there and already included in app.py
