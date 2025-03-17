@@ -1,4 +1,4 @@
-# app.py (Chunk 1)
+
 import nest_asyncio
 
 import streamlit as st
@@ -32,7 +32,7 @@ import asyncio  # To deal with event loop in certain environments
 from serpapi import GoogleSearch
 
 nest_asyncio.apply()
-# Moved to the very top, before any other Streamlit commands
+
 st.set_page_config(
     page_title="JobFit-AI",
     page_icon="📊",
@@ -40,12 +40,12 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Load environment variables (optional, but good practice)
+
 load_dotenv()
 
 # --- Configuration and Initialization ---
 
-# Initialize session state  (CRITICAL to do this *before* accessing session state)
+# Initialize session state  
 if "resume_analysis" not in st.session_state:
     st.session_state.resume_analysis = None
 if "resume_file_path" not in st.session_state:
@@ -58,12 +58,12 @@ if "current_page" not in st.session_state:
     st.session_state.current_page = "upload"
 if "relevance_score" not in st.session_state:
     st.session_state.relevance_score = None
-if "google_api_key" not in st.session_state:  # Store API keys in session state
-    st.session_state.google_api_key = ""  # Initialize as EMPTY STRING
+if "google_api_key" not in st.session_state:  
+    st.session_state.google_api_key = ""  
 if "firecrawl_api_key" not in st.session_state:
-    st.session_state.firecrawl_api_key = ""  # Initialize as EMPTY STRING
+    st.session_state.firecrawl_api_key = ""  
 if "serpapi_key" not in st.session_state:
-    st.session_state.serpapi_key = ""  # Initialize as EMPTY STRING
+    st.session_state.serpapi_key = ""  
 
 
 
@@ -75,13 +75,13 @@ def load_spacy_model():
     except OSError:
         st.warning("Downloading spaCy model 'en_core_web_lg'. This may take a few minutes...")
         try:
-            spacy.cli.download("en_core_web_lg")  # Download the model
+            spacy.cli.download("en_core_web_lg")  
         except Exception as e:
             st.error(
                 f"Error downloading spaCy model: {e}. Please ensure you have an internet connection and sufficient permissions."
             )
             st.stop()
-        return spacy.load("en_core_web_lg")  # Load after downloading
+        return spacy.load("en_core_web_lg")  
 
 
 nlp = load_spacy_model()
@@ -114,13 +114,13 @@ def extract_resume_text(file_path):
         else:
             return None, "Unsupported file format. Please upload a PDF or DOCX file."
     except Exception as e:
-        st.error(f"Error reading resume file: {e}")  # Show error in UI
+        st.error(f"Error reading resume file: {e}") 
         return None, f"Error reading file: {e}"
 
 
-from bs4 import BeautifulSoup  # Import Beautiful Soup
+from bs4 import BeautifulSoup  
 
-class Colors:  # For colored output (optional, but helpful for debugging)
+class Colors:  # For colored output 
     CYAN = '\033[96m'
     YELLOW = '\033[93m'
     GREEN = '\033[92m'
@@ -155,32 +155,32 @@ def scrape_indeed_with_firecrawl_html(url, api_key):
             html_content = result['data']['html']
             soup = BeautifulSoup(html_content, 'html.parser')
 
-            # Indeed-specific parsing (you may need to adjust selectors)
-            description_element = soup.find('div', class_='jobsearch-jobDescriptionText')  # Common class
+            # Indeed-specific parsing 
+            description_element = soup.find('div', class_='jobsearch-jobDescriptionText')  
             if description_element:
                 print(f"{Colors.GREEN}Indeed description found with Firecrawl.{Colors.RESET}")
-                return description_element.get_text(separator='\n', strip=True), None # Return text and None for error
+                return description_element.get_text(separator='\n', strip=True), None 
             else:
-                 # Another possible location, look for a div with id='jobDescriptionText'
+                
                 description_element = soup.find('div', id='jobDescriptionText')
                 if description_element:
                     print(f"{Colors.GREEN}Indeed description found with Firecrawl.{Colors.RESET}")
-                    return description_element.get_text(separator='\n', strip=True), None  # Return text and None for error
+                    return description_element.get_text(separator='\n', strip=True), None  
                 print(f"{Colors.YELLOW}Indeed description NOT found with Firecrawl.{Colors.RESET}")
-                return None, "Indeed description NOT found with Firecrawl." # Return None and error message
+                return None, "Indeed description NOT found with Firecrawl." 
         else:
             error_message = f"Firecrawl error for Indeed: {result.get('error')}"
             print(f"{Colors.RED}{error_message}{Colors.RESET}")
-            return None, error_message  # Return None and error message
+            return None, error_message  
 
     except requests.exceptions.RequestException as e:
         error_message = f"Request error for Indeed (Firecrawl): {e}"
         print(f"{Colors.RED}{error_message}{Colors.RESET}")
-        return None, error_message # Return None and error message
+        return None, error_message 
     except Exception as e:
         error_message = f"Other error on Indeed: {e}"
         print(f"{Colors.RED}{error_message}{Colors.RESET}")
-        return None, error_message   # Return None and error message
+        return None, error_message   
 
 def get_job_data_from_serpapi(job_url, serp_api_key):
     """
@@ -191,24 +191,24 @@ def get_job_data_from_serpapi(job_url, serp_api_key):
         params = {
             "engine": "google_jobs_listing",
             "q": job_url,
-            "api_key": serp_api_key  # Use the passed in API KEY
+            "api_key": serp_api_key 
         }
-        search = GoogleSearch(params) #Corrected
+        search = GoogleSearch(params) 
         results = search.get_dict()
-        # check if data exist
+       
         if 'description' in results:
 
             print(f"{Colors.GREEN}Job data found with SerpApi.{Colors.RESET}")
-            return results.get('description', ""), None # Return description text and None for error
+            return results.get('description', ""), None 
         else:
             error_message = "Job data NOT found with SerpApi."
             print(f"{Colors.YELLOW}{error_message}{Colors.RESET}")
-            return None, error_message # Return None for data and the error
+            return None, error_message 
 
     except Exception as e:
         error_message = f"Error using SerpApi: {e}"
         print(f"{Colors.RED}{error_message}{Colors.RESET}")
-        return None, error_message # Return None for data and the error
+        return None, error_message 
 def extract_job_description_from_url(job_url):
     """
     Main function to extract the job description, trying different methods.
@@ -223,18 +223,18 @@ def extract_job_description_from_url(job_url):
     if "linkedin.com/jobs/view" in job_url:
         # LinkedIn: Go straight to SerpApi
         print(f"{Colors.CYAN}Detected LinkedIn URL. Using SerpApi...{Colors.RESET}")
-        return get_job_data_from_serpapi(job_url, st.session_state.serpapi_key) # Pass SerpAPI key
+        return get_job_data_from_serpapi(job_url, st.session_state.serpapi_key) 
 
 
-    elif "indeed.com" in job_url:  #added indeed.com not www.indeed.com
-        # Indeed: Try Firecrawl first, then SerpApi
+    elif "indeed.com" in job_url:  
+        
         print(f"{Colors.CYAN}Detected Indeed URL. Trying Firecrawl...{Colors.RESET}")
         description, error = scrape_indeed_with_firecrawl_html(job_url, st.session_state.firecrawl_api_key)
         if description:
-            return description, None # Return the description if found
+            return description, None 
 
         print(f"{Colors.YELLOW}Falling back to SerpApi for Indeed...{Colors.RESET}")
-        return get_job_data_from_serpapi(job_url, st.session_state.serpapi_key) # Use SerpApi as Indeed fallback, pass key
+        return get_job_data_from_serpapi(job_url, st.session_state.serpapi_key) 
 
 
     else:
@@ -246,7 +246,7 @@ def extract_job_description_from_url(job_url):
 
 
 
-# Simple text-based PDF download (using base64 encoding)
+
 def get_pdf_download_link(analysis_text, filename="JobFit-AI_Resume_Analysis.txt"):
     """Generates a link to download the analysis as plain text."""
     try:
@@ -261,15 +261,15 @@ def get_pdf_download_link(analysis_text, filename="JobFit-AI_Resume_Analysis.txt
 
 @st.cache_resource()
 def get_llm():
-     # Use API key from session state.  Error if not set.
+     
     try:
         if not st.session_state.google_api_key:
             st.error("Google API key is not set. Please enter it in the sidebar.")
-            st.stop() # Stop if no API Key
+            st.stop() 
         return ChatGoogleGenerativeAI(
             model="gemini-1.5-pro-002",
             temperature=0.7,
-            google_api_key=st.session_state.google_api_key,  # Use session state key
+            google_api_key=st.session_state.google_api_key,  
             convert_system_message_to_human=True,
         )
     except Exception as e:
@@ -304,7 +304,7 @@ def extract_sections(state: ResumeAnalysisState) -> ResumeAnalysisState:
             "education": [],
         }
 
-        # Profile Summary (using LLM for better summarization)
+        # Profile Summary ( LLM for better summarization)
         summary_prompt = ChatPromptTemplate.from_template(
             """
             Summarize the following text in 2-3 sentences, focusing on key professional highlights:
@@ -316,10 +316,10 @@ def extract_sections(state: ResumeAnalysisState) -> ResumeAnalysisState:
         summary = summary_chain.invoke({"resume_text": state["resume_text"]}).content
         extracted_sections["profile_summary"] = summary
 
-        # Skills (using spaCy's NER and pattern matching)
+        # Skills ( spaCy's NER and pattern matching)
         skill_entities = extract_entities(state["resume_text"]).get(
             "SKILL", []
-        )  # Get skills using custom label
+        )  
 
         for sent in doc.sents:
             if "skill" in sent.text.lower():
@@ -354,9 +354,9 @@ def extract_sections(state: ResumeAnalysisState) -> ResumeAnalysisState:
     except Exception as e:
         return {**state, "error": f"Section extraction error: {str(e)}"}
     
-# app.py (Chunk 2)
 
-# Define analysis node (same as before, but using Gemini)
+
+# Defining analysis node 
 def analyze_resume(state: ResumeAnalysisState) -> ResumeAnalysisState:
     """Analyze the resume against the job description, heavily using the LLM."""
     try:
@@ -419,11 +419,11 @@ def analyze_resume(state: ResumeAnalysisState) -> ResumeAnalysisState:
         """
         )
 
-        llm = get_llm()  # Get the LLM, which now uses the session-state API key
+        llm = get_llm()  
         chain = analysis_prompt | llm | JsonOutputParser()
         analysis_result = chain.invoke(
             {
-                "resume_text": state["resume_text"],  # Pass the full resume text
+                "resume_text": state["resume_text"],  
                 "job_description": state["job_description"],
             }
         )
@@ -455,7 +455,7 @@ def calculate_relevance_score(state: ResumeAnalysisState) -> ResumeAnalysisState
         return {**state, "relevance_score": {"overall_match_score": 0}}
 
     analysis_result = state["analysis_result"]
-    if analysis_result is None:  # Check if analysis_result is None
+    if analysis_result is None: 
         return {**state, "relevance_score": {"overall_match_score": 0}}
 
     # Use the LLM-provided score if available; otherwise, calculate a basic score.
@@ -490,7 +490,7 @@ def calculate_relevance_score(state: ResumeAnalysisState) -> ResumeAnalysisState
     else:
         relevance_scores = {
             "overall_match_score": overall_score,
-            "skill_match_score": 0,  # No need to have individual scores.
+            "skill_match_score": 0,  
             "experience_weighting": 0,
             "education_score": 0,
         }
@@ -500,7 +500,7 @@ def calculate_relevance_score(state: ResumeAnalysisState) -> ResumeAnalysisState
 
 # --- LangGraph Workflow ---
 
-# Build LangGraph workflow
+
 @st.cache_resource()
 def create_workflow():
     workflow = StateGraph(ResumeAnalysisState)
@@ -509,7 +509,7 @@ def create_workflow():
     workflow.add_node("calculate_relevance_score", calculate_relevance_score)  # Add scoring
     workflow.add_node("handle_error", handle_error)
 
-    # Set the entry point
+   
     workflow.set_entry_point("extract_sections")
 
     # Define edges using conditional logic
@@ -517,18 +517,18 @@ def create_workflow():
         "extract_sections",  # Source node
         should_continue,  # Routing function
         {
-            "analyze": "analyze_resume",  # If should_continue returns "analyze"
-            "error": "handle_error",  # If should_continue returns "error"
+            "analyze": "analyze_resume",  
+            "error": "handle_error",  
         },
     )
 
     workflow.add_edge(
         "analyze_resume", "calculate_relevance_score"
-    )  # Calculate score *after* analysis
+    )  
     workflow.add_edge("calculate_relevance_score", END)
     workflow.add_edge("handle_error", END)
 
-    # Compile the graph
+    
     return workflow.compile()
 
 # --- Streamlit UI Components ---
@@ -545,15 +545,15 @@ def display_analysis_results(analysis, relevance_score):
 
     # Overall Match Score
     st.write("### 🎯 Overall Match Score")
-    score = relevance_score.get("overall_match_score", 0)  # Getting overall match score
+    score = relevance_score.get("overall_match_score", 0)  
     st.markdown(f"<h4 style='margin-bottom:0px;'>{score}/100</h4>", unsafe_allow_html=True)
     st.progress(score / 100)
 
-    # Display detailed feedback from the LLM, added some more space.
+   
     st.markdown("<br>", unsafe_allow_html=True)
     st.write("### 💡 Detailed Analysis & Feedback")
 
-    # Use markdown to render sections, so there's visual separation.
+    
     if "experience_evaluation" in analysis and analysis["experience_evaluation"]:
         st.markdown("#### Experience Evaluation")
         st.markdown(analysis["experience_evaluation"])
@@ -634,7 +634,7 @@ def process_resume():
                 st.session_state.resume_file_path
             )
             if extract_error:
-                return  # Error already displayed by extract_resume_text
+                return  
 
             # Prepare the initial state for the LangGraph workflow
             initial_state = {
@@ -652,7 +652,7 @@ def process_resume():
                 final_state = resume_analysis_chain.invoke(initial_state)
 
                 if final_state.get("error"):
-                    return  # Error already handled within the workflow
+                    return 
 
                 # Store results in session state
                 st.session_state.resume_analysis = final_state["analysis_result"]
@@ -680,7 +680,7 @@ def upload_page():
         "<p style='text-align: center; font-size: 1.2rem; margin-bottom: 2rem;'>Your Personalized AI Powered Resume Analyzer</p>",
         unsafe_allow_html=True,
     )
-    st.markdown("<br>", unsafe_allow_html=True)  # Add some vertical space
+    st.markdown("<br>", unsafe_allow_html=True) 
 
     st.write("### Upload Your Resume and Job Description")
 
@@ -708,30 +708,30 @@ def upload_page():
             if job_url and job_url != st.session_state.job_url:
                 with st.spinner("Extracting job description..."):
                     st.session_state.job_url = job_url
-                    job_desc, error = extract_job_description_from_url(job_url) # Get description AND error
+                    job_desc, error = extract_job_description_from_url(job_url) 
                     if job_desc:
-                        st.session_state.job_description = job_desc  # Store the description
+                        st.session_state.job_description = job_desc  
                         st.success("Job description extracted successfully!")
                     else:
-                        st.error(f"Couldn't extract job description: {error}") # Display the error
+                        st.error(f"Couldn't extract job description: {error}") 
                         st.warning("Please copy and paste the job description manually.")
-                        st.session_state.job_description = ""  # Clear any previous description
-            if st.session_state.job_description:  # Show the text area if a description exists (either scraped or from previous input)
+                        st.session_state.job_description = ""  
+            if st.session_state.job_description: 
                 st.session_state.job_description = st.text_area(
                     "Extracted Job Description (you can edit)",
                     st.session_state.job_description,
                     height=200,
                 )
-        else:  # "Paste Job Description"
+        else: 
             st.session_state.job_description = st.text_area(
                 "Job Description",
                 st.session_state.job_description,
                 height=200,
                 placeholder="Paste the job description here...",
             )
-    st.markdown("<br>", unsafe_allow_html=True)  # Add some vertical space
+    st.markdown("<br>", unsafe_allow_html=True)  
 
-    # Analyze button (disabled if no resume or job description)
+   
     if st.button(
         "Analyze Resume",
         type="primary",
@@ -745,7 +745,7 @@ def upload_page():
 
 def results_page():
     """Displays the analysis results and provides navigation options."""
-    # Button to start a new analysis (with clearer wording)
+    
     if st.button("Start New Analysis", type="primary"):
         # Clear relevant session state variables
         st.session_state.resume_analysis = None
@@ -754,11 +754,11 @@ def results_page():
         st.session_state.job_url = ""
         st.session_state.relevance_score = None
         st.session_state.current_page = "upload"
-        st.rerun()  # Force a rerun to switch back to the upload page
+        st.rerun()  
 
-    # Display results *only* if analysis data exists
+    
     if st.session_state.resume_analysis and st.session_state.relevance_score:
-        # Use tabs for better organization
+        
         tab1, tab2, tab3 = st.tabs(["Analysis Results", "Job Description", "Raw Resume Data"])
 
         with tab1:
@@ -766,11 +766,11 @@ def results_page():
                 st.session_state.resume_analysis, st.session_state.relevance_score
             )
 
-            # Download link (plain text)
+            
             st.markdown("---")
             analysis_text = json.dumps(
                 st.session_state.resume_analysis, indent=2
-            )  # Format as JSON for readability
+            ) 
             download_link = get_pdf_download_link(analysis_text)
             st.markdown(download_link, unsafe_allow_html=True)
 
@@ -793,7 +793,7 @@ def results_page():
             "No analysis data available. Please upload a resume and job description on the previous page."
         )
 
-    # Example Section (always shown on the results page)
+    
     with st.expander("See Example Analysis"):
         st.write(
             """
@@ -825,7 +825,7 @@ def main():
     # --- Sidebar ---
     with st.sidebar:
         st.header("Configuration")
-        # API Key Inputs (now stored in session state)
+        # API Key Inputs
         st.session_state.google_api_key = st.text_input(
             "Google Gemini API Key",
             value=st.session_state.google_api_key,
@@ -845,14 +845,14 @@ def main():
 
         st.markdown("### Advanced Options")
         st.selectbox("AI Model", ["gemini-1.5-pro-002"], disabled=True,
-            help="Select the AI model for analysis")  # Keep only the model selection
+            help="Select the AI model for analysis") 
         st.markdown("---")
 
         st.markdown("### Features")
         st.checkbox("Enable Cover Letter Generation", value=False, disabled=True,
-                   help="Coming soon")  # Keep as disabled for now
+                   help="Coming soon")  
         st.checkbox("Generate Interview Questions", value=False, disabled=True,
-                   help="Coming soon")  # Keep as disabled for now
+                   help="Coming soon")  
         st.markdown("---")
 
         #Dashboard Button
@@ -860,13 +860,13 @@ def main():
             st.session_state.current_page = "dashboard"
             st.rerun()
 
-        # Home Button (added here, below Dashboard)
+        # Home Button 
         if st.button("Home", key="home_button", use_container_width=True):
             st.session_state.current_page = "upload"
             st.rerun()
 
-        st.markdown("---") # Separator for About section
-        #About Section: Moved to the bottom of the sidebar.
+        st.markdown("---") 
+        #About Section
         st.markdown("### About")
         st.markdown("JobFit-AI uses AI to analyze resumes and provide personalized career recommendations.")
         st.markdown("Powered by LangChain, LangGraph, Google Gemini, Firecrawl, and SerpAPI")
@@ -881,7 +881,7 @@ def main():
     elif st.session_state.current_page == "dashboard":
         dashboard_page()
 
-    # --- Footer (centered) ---
+    # --- Footer  ---
     st.markdown(
         """
         <div style="text-align: center; margin-top: 2rem;">
